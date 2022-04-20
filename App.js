@@ -1,10 +1,40 @@
-import React from "react";
+import React, {useState} from "react";
 import { ScrollView,StyleSheet, Text, View,TextInput,Button, TouchableOpacity,Image } from "react-native";
-import { render } from "react-native/Libraries/Renderer/implementations/ReactNativeRenderer-prod";
+import FlashMessage, { showMessage, hideMessage} from "react-native-flash-message";
+import { validateEmail, validatePassword } from './src/validation';
 
 const App = () => {
+  const ShowMessage = (message, description, type)=>{
+    showMessage({
+      message: message,
+      description: description,
+      type: type,
+      position:'top',
+      floating: 'true',
+
+    })
+  }
+  const [state, setState ]= useState({
+ email:'',
+ password:'',
+  });
+  const [error, setErrors] = useState({ email:'', password:''})
+
+  const onSubmit=()=>{
+    const emailError = validateEmail(state.email);
+    const passwordError = validatePassword(state.password);
+    // setErrors ({ email: emailError, password: passwordError});
+    if (emailError === null || passwordError === null){
+      ShowMessage('Sucess','Login Sucess','success')
+    }
+    else{
+      ShowMessage('Error','Wrong Password or Email','danger')
+    }
+  }
   return(
+    
     <View style={styles.container}>
+      <ScrollView style={ styles.styleScroll}>
       <View style={styles.Char1}>
 
       <View>
@@ -24,19 +54,28 @@ const App = () => {
       <Image style={styles.Loginto} source={require("./anh/login1.png")} />
 
       <View style={styles.input}>
-      <Image style={styles.icon} source={require("./anh/lathu.png")} />
-        <TextInput  placeholder="Email" />
+        <Image style={styles.icon} source={require("./anh/lathu.png")} />
+        <TextInput  placeholder="Email" 
+        onChangeText={text => setState({ ... state, email: text.toLocaleLowerCase() })}
+        value={state.email}/>
       </View>
       
       <View style={styles.input}>
       <Image style={styles.icon} source={require("./anh/pass.png")} />
-        <TextInput placeholder="Password" />
+        <TextInput placeholder="Password" 
+         onChangeText={text => setState({ ... state, password: text })}
+         value={state.password}/>
         <Image style={styles.icon2} source={require("./anh/mi.png")} />
+        
       </View>
 
-      <View style={styles.button_login}>
-        <Text style={{color:'white',fontWeight:'bold',fontSize:18}}>Login</Text>
+      
+    
+        <TouchableOpacity style = {styles.button_login} onPress = {() => onSubmit()}>
+          <Text style={styles.textbuton}>Login</Text>
+        </TouchableOpacity>
       </View>
+      <FlashMessage style={styles.styleMessError} position="top" textStyle={{textAlign:'center', fontSize:16}}  titleStyle={{textAlign:'center', fontSize:15}}  />
 
       <View style={{
         flex: 1,
@@ -46,21 +85,30 @@ const App = () => {
         }}>
         <Text>Forgot Password? </Text>
         <Text style={{fontFamily:'bold',color:'black'}}>Click Here</Text>
+        
+      </View>
+      </ScrollView>
       </View>
      
-      </View>
-    </View>
   )
 }
 
 const styles = StyleSheet.create({
   container : {
     flex: 1,
+    height:'100%',
     alignItems: "center",
     backgroundColor: '#ffd834'
   },
+  styleScroll:{
+    flex:1,
+  },
   Char1 : {
-    top:100,
+    flex:1,
+    padding:'10%',
+    justifyContent: 'flex-end',
+    marginTop:30,
+    marginLeft:-10
   },
 
   Imagelabbit:{
@@ -75,6 +123,7 @@ const styles = StyleSheet.create({
     right:14,
     bottom:50
   },
+  textbuton:{},
 
   Loginto:{
     alignItems: 'center',
@@ -98,18 +147,22 @@ const styles = StyleSheet.create({
     alignItems:'center',
     backgroundColor:'#FF6D03',
     borderRadius:100,
-    top: 30
+    top: 30,
   },
-
+  Errortext: {
+    color: 'red',
+    paddingBottom: 5,
+    paddingLeft: 5,
+  },
   buttonText:{
     textAlign: 'center',
     color: '#fff',
-    fontWeight: 'bold',
-    fontSize: 18
+    fontWeight: 'bol0d',
+    fontSize: 18,
   },
 
   input1:{
-    
+    flexDirection:'row',
     alignItems: 'center',
     backgroundColor:'white',
     borderRadius:100,
@@ -155,6 +208,11 @@ const styles = StyleSheet.create({
     alignItems:'center',
     bottom: 50,
   },
+  styleMessError:{
+    position:'relative',
+    marginTop: 8
+    
+  }
 
 });
 
